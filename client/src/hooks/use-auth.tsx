@@ -4,7 +4,11 @@ import {
   useMutation,
   UseMutationResult,
 } from "@tanstack/react-query";
-import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
+import {
+  insertUserSchema,
+  User as SelectUser,
+  InsertUser,
+} from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,6 +33,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } = useQuery<SelectUser | undefined, Error>({
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
+    staleTime: 5 * 60 * 1000, // 5 minutes - data is fresh for 5 mins
+    gcTime: 10 * 60 * 1000, // Keep data in cache for 10 mins
+    refetchOnMount: "stale", // Refetch only if data is older than staleTime
+    refetchOnWindowFocus: "stale", // Refetch on focus only if stale
+    refetchOnReconnect: "stale", // Refetch if reconnected and data is stale
   });
 
   const loginMutation = useMutation({
@@ -70,7 +79,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
+      // Clear user data immediately
       queryClient.setQueryData(["/api/user"], null);
+      // Invalidate all queries to ensure clean state
+      queryClient.clear();
     },
     onError: (error: Error) => {
       toast({

@@ -15,12 +15,30 @@ import { users, members, diamonds, diamondPrices } from "@shared/schema";
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
 
+  // Health check endpoint for deployment monitoring
+  app.get("/api/health", (req, res) => {
+    res.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      authenticated: req.isAuthenticated(),
+      uptime: process.uptime(),
+    });
+  });
+
+  // Authentication status endpoint
+  app.get("/api/auth-status", (req, res) => {
+    res.json({
+      authenticated: req.isAuthenticated(),
+      userId: req.user?.id || null,
+    });
+  });
+
   // Database viewer endpoint (for development only)
-  app.get("/api/admin/database", (req, res) => {
+  app.get("/api/admin/database", async (req, res) => {
     try {
-      const allUsers = db.select().from(users).all();
-      const allMembers = db.select().from(members).all();
-      const allDiamonds = db.select().from(diamonds).all();
+      const allUsers = await db.select().from(users);
+      const allMembers = await db.select().from(members);
+      const allDiamonds = await db.select().from(diamonds);
 
       res.json({
         summary: {

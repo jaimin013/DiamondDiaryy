@@ -7,7 +7,7 @@ import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser, registerSchema } from "@shared/schema";
 import { ZodError } from "zod";
-import { rawDb } from "./db";
+import createMemoryStore from "memorystore";
 
 declare global {
   namespace Express {
@@ -30,77 +30,34 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
-// Database-backed session store
-class SQLiteSessionStore extends session.Store {
-  get(sid: string, callback: (err?: Error | null, session?: any) => void) {
-    try {
-      const row = rawDb
-        .prepare(`SELECT sess FROM sessions WHERE sid = ? AND expire > ?`)
-        .get(sid, Date.now() / 1000) as any;
-
-      if (!row) return callback();
-      callback(null, JSON.parse(row.sess));
-    } catch (err) {
-      callback(err as Error);
-    }
-  }
-
-  set(sid: string, sess: any, callback?: (err?: Error | null) => void) {
-    try {
-      const expire = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60; // 1 week
-      rawDb
-        .prepare(
-          `INSERT OR REPLACE INTO sessions (sid, sess, expire) VALUES (?, ?, ?)`,
-        )
-        .run(sid, JSON.stringify(sess), expire);
-
-      if (callback) callback();
-    } catch (err) {
-      if (callback) callback(err as Error);
-    }
-  }
-
-  destroy(sid: string, callback?: (err?: Error | null) => void) {
-    try {
-      rawDb.prepare(`DELETE FROM sessions WHERE sid = ?`).run(sid);
-      if (callback) callback();
-    } catch (err) {
-      if (callback) callback(err as Error);
-    }
-  }
-}
-
 export function setupAuth(app: Express) {
-  const sessionStore = new SQLiteSessionStore();
+  // Create session store (memory store works well for all environments)
+  const MemoryStore = createMemoryStore(session);
+  const sessionStore = new MemoryStore({
+    checkPeriod: 86400000, // Prune expired entries every 24 hours
+  });
 
-  // Clean up expired sessions periodically
-  setInterval(
-    () => {
-      try {
-        rawDb
-          .prepare(`DELETE FROM sessions WHERE expire < ?`)
-          .run(Math.floor(Date.now() / 1000));
-      } catch (err) {
-        console.error("Error cleaning up sessions:", err);
-      }
-    },
-    60 * 60 * 1000,
-  ); // 1 hour
+  // Generate secure session secret
+  const sessionSecret =
+    process.env.SESSION_SECRET || randomBytes(32).toString("hex");
 
   const sessionSettings: session.SessionOptions = {
     store: sessionStore,
-    secret: process.env.SESSION_SECRET! || "jnfkdfnvkjf",
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-      secure: false, // for local dev over HTTP
+      secure: process.env.NODE_ENV === "production", // HTTPS only in production
       sameSite: "lax",
+      httpOnly: true, // Prevent XSS attacks
     },
   };
 
-  // For local development do not require a proxy; in production behind a proxy set trusted proxy appropriately.
-  app.set("trust proxy", 0);
+  // Trust proxy only in production
+  if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+  }
   app.use(session(sessionSettings));
   app.use(passport.initialize());
   app.use(passport.session());

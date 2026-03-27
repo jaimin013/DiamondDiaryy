@@ -1,9 +1,16 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import {
+  pgTable,
+  text,
+  integer,
+  real,
+  serial,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   name: text("name"),
@@ -13,15 +20,15 @@ export const users = sqliteTable("users", {
   notificationsEnabled: text("notifications_enabled").default("true"),
 });
 
-export const members = sqliteTable("members", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const members = pgTable("members", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   serialNumber: text("serial_number").notNull(),
   name: text("name").notNull(),
 });
 
-export const diamonds = sqliteTable("diamonds", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const diamonds = pgTable("diamonds", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   memberId: integer("member_id").notNull(),
   date: text("date").notNull(),
@@ -32,8 +39,8 @@ export const diamonds = sqliteTable("diamonds", {
   total: real("total").notNull(),
 });
 
-export const diamondPrices = sqliteTable("diamond_prices", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const diamondPrices = pgTable("diamond_prices", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   name: text("name").notNull(),
   weightFrom: real("weight_from").notNull(),
@@ -41,13 +48,22 @@ export const diamondPrices = sqliteTable("diamond_prices", {
   price: real("price").notNull(),
 });
 
-export const workDays = sqliteTable("work_days", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: integer("user_id").notNull(),
-  memberId: integer("member_id").notNull(),
-  date: text("date").notNull(), // Format: YYYY-MM-DD
-  isWorkDay: text("is_work_day").notNull().default("true"), // "true" or "false"
-});
+export const workDays = pgTable(
+  "work_days",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").notNull(),
+    memberId: integer("member_id").notNull(),
+    date: text("date").notNull(), // Format: YYYY-MM-DD
+    isWorkDay: text("is_work_day").notNull().default("true"), // "true" or "false"
+  },
+  (table) => ({
+    uniqueMemberDate: uniqueIndex("unique_member_date").on(
+      table.memberId,
+      table.date,
+    ),
+  }),
+);
 
 // Create base schemas
 export const insertUserSchema = createInsertSchema(users);

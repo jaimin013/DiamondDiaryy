@@ -30,43 +30,42 @@ export class DBStorage implements IStorage {
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return await db.select().from(users).where(eq(users.id, id)).get();
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return await db
+    const result = await db
       .select()
       .from(users)
-      .where(eq(users.username, username))
-      .get();
+      .where(eq(users.username, username));
+    return result[0];
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    db.insert(users).values(user).run();
+    await db.insert(users).values(user);
     const created = await this.getUserByUsername(user.username);
     if (!created) throw new Error("Failed to create user");
     return created;
   }
 
   async getMembers(userId: number): Promise<Member[]> {
-    return await db
-      .select()
-      .from(members)
-      .where(eq(members.userId, userId))
-      .all();
+    return await db.select().from(members).where(eq(members.userId, userId));
   }
 
   async getMember(id: number): Promise<Member | undefined> {
-    return await db.select().from(members).where(eq(members.id, id)).get();
+    const result = await db.select().from(members).where(eq(members.id, id));
+    return result[0];
   }
 
   async getDiamond(id: number): Promise<Diamond | undefined> {
-    return await db.select().from(diamonds).where(eq(diamonds.id, id)).get();
+    const result = await db.select().from(diamonds).where(eq(diamonds.id, id));
+    return result[0];
   }
 
   async createMember(member: InsertMember): Promise<Member> {
     console.log("Creating member with data:", member);
-    const result = db.insert(members).values(member).returning().all();
+    const result = await db.insert(members).values(member).returning();
     console.log("Inserted result:", result);
     const created = result[0];
     console.log("Created:", created);
@@ -100,8 +99,7 @@ export class DBStorage implements IStorage {
         .from(diamonds)
         .where(
           and(eq(diamonds.userId, userId), eq(diamonds.memberId, memberId)),
-        )
-        .all();
+        );
 
       // Validate result - ensure all belong to correct member
       const invalid = result.filter(
@@ -116,15 +114,11 @@ export class DBStorage implements IStorage {
     }
 
     console.log("getDiamonds - Fetching all for userId:", userId);
-    return await db
-      .select()
-      .from(diamonds)
-      .where(eq(diamonds.userId, userId))
-      .all();
+    return await db.select().from(diamonds).where(eq(diamonds.userId, userId));
   }
 
   async createDiamond(diamond: InsertDiamond): Promise<Diamond> {
-    const result = db.insert(diamonds).values(diamond).returning().all();
+    const result = await db.insert(diamonds).values(diamond).returning();
     const created = result[0];
     if (!created) throw new Error("Failed to create diamond");
     return created;
@@ -142,20 +136,19 @@ export class DBStorage implements IStorage {
     return await db
       .select()
       .from(diamondPrices)
-      .where(eq(diamondPrices.userId, userId))
-      .all();
+      .where(eq(diamondPrices.userId, userId));
   }
 
   async getDiamondPrice(id: number): Promise<any | undefined> {
-    return await db
+    const result = await db
       .select()
       .from(diamondPrices)
-      .where(eq(diamondPrices.id, id))
-      .get();
+      .where(eq(diamondPrices.id, id));
+    return result[0];
   }
 
   async createDiamondPrice(price: any): Promise<any> {
-    const result = db.insert(diamondPrices).values(price).returning().all();
+    const result = await db.insert(diamondPrices).values(price).returning();
     const created = result[0];
     if (!created) throw new Error("Failed to create diamond price");
     return created;
@@ -181,8 +174,7 @@ export class DBStorage implements IStorage {
     const allDays = await db
       .select()
       .from(workDays)
-      .where(and(eq(workDays.userId, userId), eq(workDays.memberId, memberId)))
-      .all();
+      .where(and(eq(workDays.userId, userId), eq(workDays.memberId, memberId)));
 
     if (monthYear) {
       // Filter work days for a specific month, format: YYYY-MM
@@ -192,7 +184,8 @@ export class DBStorage implements IStorage {
   }
 
   async getWorkDay(id: number): Promise<WorkDay | undefined> {
-    return await db.select().from(workDays).where(eq(workDays.id, id)).get();
+    const result = await db.select().from(workDays).where(eq(workDays.id, id));
+    return result[0];
   }
 
   async createOrUpdateWorkDay(
@@ -211,21 +204,20 @@ export class DBStorage implements IStorage {
           eq(workDays.memberId, memberId),
           eq(workDays.date, date),
         ),
-      )
-      .get();
+      );
 
-    if (existing) {
+    if (existing[0]) {
       // Update existing
       await db
         .update(workDays)
         .set({ isWorkDay: isWorkDay ? "true" : "false" })
-        .where(eq(workDays.id, existing.id));
-      const updated = await this.getWorkDay(existing.id);
+        .where(eq(workDays.id, existing[0].id));
+      const updated = await this.getWorkDay(existing[0].id);
       if (!updated) throw new Error("Work day not found");
       return updated;
     } else {
       // Create new
-      const result = db
+      const result = await db
         .insert(workDays)
         .values({
           userId,
@@ -233,8 +225,7 @@ export class DBStorage implements IStorage {
           date,
           isWorkDay: isWorkDay ? "true" : "false",
         })
-        .returning()
-        .all();
+        .returning();
       const created = result[0];
       if (!created) throw new Error("Failed to create work day");
       return created;

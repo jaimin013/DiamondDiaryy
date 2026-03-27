@@ -181,17 +181,37 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
 
   return (
     <div className="w-full">
-      <Card className="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50">
-        <CardHeader className="border-b border-slate-700/50 pb-4">
+      <Card
+        className="rounded-lg border transition-colors"
+        style={{
+          background: `linear-gradient(to bottom right, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 80%, transparent))`,
+          borderColor: "var(--border-color)",
+        }}
+      >
+        <CardHeader
+          className="border-b pb-4"
+          style={{
+            borderColor: "var(--border-color)",
+          }}
+        >
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg sm:text-xl text-white">
+              <CardTitle
+                className="text-lg sm:text-xl"
+                style={{ color: "var(--text-primary)" }}
+              >
                 Member Calendar
               </CardTitle>
-              <p className="text-slate-400 text-xs sm:text-sm mt-1">
+              <p
+                className="text-xs sm:text-sm mt-1"
+                style={{ color: "var(--text-secondary)" }}
+              >
                 {memberName} (ID: {memberId})
               </p>
-              <p className="text-slate-500 text-xs mt-2">
+              <p
+                className="text-xs mt-2"
+                style={{ color: "var(--text-tertiary)" }}
+              >
                 Total work entries: {allDiamonds.length} | This month:{" "}
                 {Object.keys(diamondsByDate).length} days
               </p>
@@ -206,12 +226,18 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
               variant="ghost"
               size="sm"
               onClick={handlePrevMonth}
-              className="hover:bg-slate-700 text-slate-300 hover:text-slate-100"
+              className="hover:bg-opacity-20 transition-colors"
+              style={{
+                color: "var(--text-secondary)",
+              }}
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
 
-            <h2 className="text-lg sm:text-xl font-bold text-white min-w-48 text-center">
+            <h2
+              className="text-lg sm:text-xl font-bold min-w-48 text-center"
+              style={{ color: "var(--text-primary)" }}
+            >
               {currentDate.toLocaleDateString("en-US", {
                 month: "long",
                 year: "numeric",
@@ -222,7 +248,10 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
               variant="ghost"
               size="sm"
               onClick={handleNextMonth}
-              className="hover:bg-slate-700 text-slate-300 hover:text-slate-100"
+              className="hover:bg-opacity-20 transition-colors"
+              style={{
+                color: "var(--text-secondary)",
+              }}
             >
               <ChevronRight className="h-5 w-5" />
             </Button>
@@ -234,7 +263,8 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
               (dayName) => (
                 <div
                   key={dayName}
-                  className="text-center text-xs sm:text-sm font-semibold text-slate-400 py-2"
+                  className="text-center text-xs sm:text-sm font-semibold py-2"
+                  style={{ color: "var(--text-secondary)" }}
                 >
                   {dayName}
                 </div>
@@ -249,7 +279,10 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
                 return (
                   <div
                     key={`empty-${index}`}
-                    className="aspect-square rounded-lg bg-slate-900/50"
+                    className="aspect-square rounded-lg"
+                    style={{
+                      backgroundColor: "rgba(13, 115, 119, 0.1)",
+                    }}
                   />
                 );
               }
@@ -263,17 +296,23 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
                 <button
                   key={day}
                   onClick={() => handleDayClick(day)}
-                  className={`
-                    aspect-square rounded-lg font-semibold text-sm sm:text-base
-                    flex items-center justify-center transition-all duration-200
-                    ${
-                      isWorkDay
-                        ? "bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-emerald-500/25"
-                        : "bg-gradient-to-br from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30 text-red-300 hover:text-red-200 border border-red-500/30"
-                    }
-                    ${todayFlag ? "ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-800" : ""}
-                    hover:scale-105
-                  `}
+                  className="aspect-square rounded-lg font-semibold text-sm sm:text-base flex items-center justify-center transition-all duration-200 hover:scale-105"
+                  style={{
+                    backgroundColor: isWorkDay
+                      ? "var(--color-primary)"
+                      : "rgba(239, 68, 68, 0.15)",
+                    color: isWorkDay ? "#ffffff" : "rgba(239, 68, 68, 0.7)",
+                    border: isWorkDay
+                      ? "none"
+                      : "1px solid rgba(239, 68, 68, 0.3)",
+                    boxShadow: isWorkDay
+                      ? "0 8px 16px rgba(13, 115, 119, 0.2)"
+                      : "none",
+                    outline: todayFlag
+                      ? `2px solid var(--color-secondary)`
+                      : "none",
+                    outlineOffset: todayFlag ? "2px" : "0",
+                  }}
                   title={
                     isWorkDay
                       ? `${dayEntries.length} work entry(ies)`
@@ -287,19 +326,40 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
           </div>
 
           {/* Legend */}
-          <div className="mt-6 pt-4 border-t border-slate-700/50">
+          <div
+            className="mt-6 pt-4 border-t"
+            style={{
+              borderColor: "var(--border-color)",
+            }}
+          >
             <div className="flex flex-col sm:flex-row gap-4 text-xs sm:text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-gradient-to-r from-emerald-500 to-emerald-600" />
-                <span className="text-slate-300">Work Day</span>
+                <div
+                  className="w-4 h-4 rounded"
+                  style={{ backgroundColor: "var(--color-primary)" }}
+                />
+                <span style={{ color: "var(--text-secondary)" }}>Work Day</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-red-500/30 border border-red-500/50" />
-                <span className="text-slate-300">Non-Work Day</span>
+                <div
+                  className="w-4 h-4 rounded border"
+                  style={{
+                    backgroundColor: "rgba(239, 68, 68, 0.15)",
+                    borderColor: "rgba(239, 68, 68, 0.3)",
+                  }}
+                />
+                <span style={{ color: "var(--text-secondary)" }}>
+                  Non-Work Day
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded ring-2 ring-yellow-400" />
-                <span className="text-slate-300">Today</span>
+                <div
+                  className="w-4 h-4 rounded"
+                  style={{
+                    border: `2px solid var(--color-secondary)`,
+                  }}
+                />
+                <span style={{ color: "var(--text-secondary)" }}>Today</span>
               </div>
             </div>
           </div>
@@ -311,9 +371,26 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
         open={!!selectedDay}
         onOpenChange={(open) => !open && setSelectedDay(null)}
       >
-        <DialogContent className="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700/50 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-lg sm:text-xl">
+        <DialogContent
+          className="border shadow-2xl max-w-md"
+          style={{
+            background: "var(--bg-primary)",
+            borderColor: "var(--border-color)",
+            color: "var(--text-primary)",
+          }}
+        >
+          <DialogHeader
+            className="border-b pb-4"
+            style={{
+              borderColor: "var(--border-color)",
+            }}
+          >
+            <DialogTitle
+              className="text-lg sm:text-xl font-bold"
+              style={{
+                color: "var(--color-primary)",
+              }}
+            >
               {selectedDay &&
                 new Date(selectedDay.date).toLocaleDateString("en-US", {
                   weekday: "long",
@@ -327,54 +404,151 @@ export function MemberCalendar({ memberId, memberName }: MemberCalendarProps) {
           <div className="mt-4">
             {selectedDay?.isWorkDay ? (
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="text-sm text-emerald-300 font-medium">
-                    Work Day ({selectedDay.entries.length} entry/entries)
+                <div
+                  className="flex items-center gap-3 p-3 rounded-lg border transition-all"
+                  style={{
+                    backgroundColor: "var(--bg-secondary)",
+                    borderColor: "var(--border-color)",
+                  }}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{
+                      background: "var(--color-primary)",
+                    }}
+                  />
+                  <span
+                    className="text-sm font-medium"
+                    style={{
+                      color: "var(--color-primary)",
+                    }}
+                  >
+                    Work Day — {selectedDay.entries.length} entry/entries
                   </span>
                 </div>
 
-                <div className="space-y-3 max-h-72 overflow-y-auto">
+                <div className="space-y-3 max-h-72 overflow-y-auto pr-2">
                   {selectedDay.entries.map((entry, i) => (
                     <div
                       key={i}
-                      className="p-3 bg-slate-900/50 rounded-lg border border-slate-700/50 text-xs sm:text-sm"
+                      className="p-4 rounded-lg border transition-all duration-200 space-y-3"
+                      style={{
+                        backgroundColor: "var(--bg-secondary)",
+                        borderColor: "var(--border-color)",
+                      }}
                     >
-                      <div className="flex justify-between items-start gap-2 mb-2">
-                        <span className="font-semibold text-emerald-400">
+                      <div className="flex justify-between items-start gap-2">
+                        <span
+                          className="font-bold"
+                          style={{
+                            color: "var(--color-primary)",
+                          }}
+                        >
                           Entry {i + 1}
                         </span>
+                        <span
+                          className="text-xs px-2 py-1 rounded-full border"
+                          style={{
+                            backgroundColor: "var(--bg-tertiary)",
+                            color: "var(--color-primary)",
+                            borderColor: "var(--border-color)",
+                          }}
+                        >
+                          Completed
+                        </span>
                       </div>
-                      <div className="space-y-1 text-slate-300">
-                        <p>
-                          <span className="text-slate-400">Weight:</span>{" "}
-                          {entry.weightFrom} → {entry.weightTo} (Qty:{" "}
-                          {entry.quantity})
-                        </p>
-                        <p>
-                          <span className="text-slate-400">Price:</span> $
-                          {entry.price.toFixed(2)}/unit
-                        </p>
-                        <p>
-                          <span className="text-slate-400">Total:</span>{" "}
-                          <span className="text-emerald-400 font-semibold">
-                            ${entry.total.toFixed(2)}
+
+                      <div
+                        className="space-y-2"
+                        style={{ color: "var(--text-secondary)" }}
+                      >
+                        <div
+                          className="flex justify-between items-center p-2 rounded border"
+                          style={{
+                            backgroundColor: "var(--bg-tertiary)",
+                            borderColor: "var(--border-color)",
+                          }}
+                        >
+                          <span>Weight:</span>
+                          <span
+                            className="font-semibold"
+                            style={{
+                              color: "var(--color-primary)",
+                            }}
+                          >
+                            {entry.weightFrom} → {entry.weightTo} (Qty:{" "}
+                            {entry.quantity})
                           </span>
-                        </p>
+                        </div>
+
+                        <div
+                          className="flex justify-between items-center p-2 rounded border"
+                          style={{
+                            backgroundColor: "var(--bg-tertiary)",
+                            borderColor: "var(--border-color)",
+                          }}
+                        >
+                          <span>Price/Unit:</span>
+                          <span
+                            className="font-semibold"
+                            style={{
+                              color: "var(--color-secondary)",
+                            }}
+                          >
+                            ₹{entry.price.toFixed(2)}
+                          </span>
+                        </div>
+
+                        <div
+                          className="flex justify-between items-center p-3 rounded border"
+                          style={{
+                            backgroundColor: "var(--bg-secondary)",
+                            borderColor: "var(--border-color)",
+                          }}
+                        >
+                          <span style={{ color: "var(--text-primary)" }}>
+                            Total :
+                          </span>
+                          <span
+                            className="font-bold text-lg"
+                            style={{
+                              color: "var(--color-primary)",
+                            }}
+                          >
+                            ₹{entry.total.toFixed(2)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="text-sm text-red-300 font-medium">
+              <div className="space-y-4">
+                <div
+                  className="flex items-center gap-3 p-3 rounded-lg border"
+                  style={{
+                    backgroundColor: "var(--bg-secondary)",
+                    borderColor: "var(--border-color)",
+                  }}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{
+                      backgroundColor: "var(--color-error)",
+                    }}
+                  />
+                  <span
+                    style={{ color: "var(--color-error)" }}
+                    className="text-sm font-medium"
+                  >
                     Non-Work Day
                   </span>
                 </div>
-                <p className="text-sm text-slate-400">
+                <p
+                  className="text-sm text-center py-4"
+                  style={{ color: "var(--text-secondary)" }}
+                >
                   No work entries recorded for this day.
                 </p>
               </div>
