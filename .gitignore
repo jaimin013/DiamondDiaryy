@@ -1,0 +1,21 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+docs
+.env
+# Database files - NEVER commit live database
+database.db
+database/diamonds.db
+database/diamonds.db-shm
+database/diamonds.db-wal
+
+# Database backups - keep directory structure but not files
+database/backups/*.db
+database/backups/*.db-*
+!database/backups/.gitkeep
+
+# Migrations log could contain sensitive timing info
+database/migrations.json
