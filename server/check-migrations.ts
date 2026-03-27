@@ -26,7 +26,7 @@ async function main() {
   if (compatible) {
     console.log("✅ All migrations are compatible and in correct order");
   } else {
-    console.log("❌ Migration compatibility issues detected");
+    console.log("   Migration compatibility issues detected");
     console.log("   Please review your migration history");
     process.exit(1);
   }

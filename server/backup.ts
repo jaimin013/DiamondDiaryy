@@ -53,13 +53,13 @@ export function backupDatabase() {
 
     console.log(`[Backup] ✅ Database backed up successfully`);
     console.log(
-      `        📦 File: diamonds.backup.${timestamp}.db (${sizeKB} KB)`,
+      `            File: diamonds.backup.${timestamp}.db (${sizeKB} KB)`,
     );
 
     // Cleanup old backups (keep only last 30)
     cleanupOldBackups();
   } catch (error) {
-    console.error("[Backup] ❌ Backup failed:", error);
+    console.error("[Backup]    Backup failed:", error);
   }
 }
 
@@ -86,7 +86,7 @@ function cleanupOldBackups() {
     }
 
     console.log(
-      `[Backup] 📊 Active backups: ${Math.min(files.length, 30)} (max 30)`,
+      `[Backup]     Active backups: ${Math.min(files.length, 30)} (max 30)`,
     );
   } catch (error) {
     console.error("[Backup] Cleanup error:", error);
@@ -119,7 +119,7 @@ export function restoreBackup(backupTimestamp: string) {
     if (fs.existsSync(DB_PATH)) {
       fs.copyFileSync(DB_PATH, safetyPath);
       console.log(
-        `[Restore] 📦 Safety copy created: pre-restore.${safetyTimestamp}.db`,
+        `[Restore]     Safety copy created: pre-restore.${safetyTimestamp}.db`,
       );
     }
 
@@ -127,7 +127,7 @@ export function restoreBackup(backupTimestamp: string) {
     fs.copyFileSync(backupPath, DB_PATH);
 
     console.log(`[Restore] ✅ Database restored successfully`);
-    console.log(`         📋 Restored from: ${backupTimestamp}`);
+    console.log(`           Restored from: ${backupTimestamp}`);
     console.log(`         🛡️  Safety copy at: ${safetyTimestamp}`);
 
     return {
@@ -136,7 +136,7 @@ export function restoreBackup(backupTimestamp: string) {
       safetyBackup: safetyTimestamp,
     };
   } catch (error) {
-    console.error("[Restore] ❌ Restore failed:", error);
+    console.error("[Restore]    Restore failed:", error);
     throw error;
   }
 }

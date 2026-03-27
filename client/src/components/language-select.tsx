@@ -34,13 +34,13 @@ export function LanguageSelect() {
           value="en"
           className="focus:bg-emerald-500/20 dark:focus:bg-emerald-600/20 focus:text-emerald-300 dark:focus:text-emerald-600"
         >
-          🇬🇧 English
+          English
         </SelectItem>
         <SelectItem
           value="gu"
           className="focus:bg-emerald-500/20 dark:focus:bg-emerald-600/20 focus:text-emerald-300 dark:focus:text-emerald-600"
         >
-          🇮🇳 ગુજરાતી
+          ગુજરાતી
         </SelectItem>
       </SelectContent>
     </Select>

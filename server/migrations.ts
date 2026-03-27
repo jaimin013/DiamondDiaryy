@@ -53,7 +53,7 @@ export function trackMigration(
 
     return migration;
   } catch (error) {
-    console.error("[Migration] ❌ Tracking failed:", error);
+    console.error("[Migration]    Tracking failed:", error);
     throw error;
   }
 }
@@ -86,13 +86,13 @@ export function printHistory() {
     return;
   }
 
-  console.log("\n📋 MIGRATION HISTORY\n");
+  console.log("\n  MIGRATION HISTORY\n");
   console.log("=".repeat(70));
 
   migrations.forEach((migration, index) => {
     const date = new Date(migration.timestamp);
     console.log(`${index + 1}. Version ${migration.version}`);
-    console.log(`   📅 Applied: ${date.toLocaleString()}`);
+    console.log(`       Applied: ${date.toLocaleString()}`);
     console.log(`   📝 Description: ${migration.description}`);
     if (migration.changedFields) {
       console.log(`   🔧 Changes: ${migration.changedFields.join(", ")}`);
